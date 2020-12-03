@@ -1,7 +1,6 @@
 package com.iiht.training.eloan.service.impl;
 
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,10 +174,10 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public LoanOutputDto applyLoan(Long customerId, LoanDto loanDto){
+		Users user = this.usersRepository.findByIdAndRole(customerId,"Customer").orElseThrow(() -> new CustomerNotFoundException("Customer Not Found"));
 		// convert DTO into entity
 		Loan loan = this.convertLoanDtoToEntity(customerId, loanDto, 0, "");
 		
-		Users user = this.usersRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer Not Found"));
 		Loan newLoan = this.loanRepository.save(loan);
 		
 		// convert entity into output DTO
@@ -208,7 +207,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<LoanOutputDto> getStatusAll(Long customerId) {
-		this.usersRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer Not Found"));
+		this.usersRepository.findByIdAndRole(customerId,"Customer").orElseThrow(() -> new CustomerNotFoundException("Customer Not Found"));
 		
 		//Get List of loans using Customer Id
 		List<Loan> allLoan = this.loanRepository.findAllByCustomerId(customerId).orElseThrow(() -> new LoanNotFoundException("No Applied Loans Found"));
